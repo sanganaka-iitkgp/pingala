@@ -1,0 +1,16 @@
+torch
+transformers
+peft
+bitsandbytes
+sentence-transformers
+scikit-learn
+skrutable
+indic-transliteration
+pandas
+numpy
+matplotlib
+seaborn
+datasets
+faiss-gpu
+tqdm
+scipy
