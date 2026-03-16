@@ -39,7 +39,6 @@ torch.manual_seed(SEED)
 
 
 class Config:
-    input_csv = "train_fixed.csv"
     english_col = "english"
     sanskrit_col = "sanskrit"
 
@@ -417,8 +416,17 @@ def evaluate_model(model, tokenizer, df_test):
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Cross-Encoder Training (FAISS Hard Negative Mining)")
+    parser.add_argument("--input_csv", type=str, required=True, help="Input CSV with English and Sanskrit columns")
+    parser.add_argument("--mining_model", type=str, default="sanganaka/bge-m3-sanskritFT", help="Bi-encoder for hard negative mining")
+    parser.add_argument("--model_name", type=str, default="microsoft/infoxlm-large", help="Cross-encoder base model")
+    args = parser.parse_args()
+
+    config.mining_model = args.mining_model
+    config.model_name = args.model_name
+
     try:
-        df = load_data(config.input_csv)
+        df = load_data(args.input_csv)
         df_full = create_negatives_curriculum(df)
         df_train, df_dev, df_test = split_data(df_full)
 

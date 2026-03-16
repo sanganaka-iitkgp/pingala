@@ -35,10 +35,10 @@ class MetricsOutput:
     semantic_similarities: torch.Tensor
 
 
-def evaluate_generated(inputs, poetry_outputs: List[str], dataset_name: str = ''):
+def evaluate_generated(inputs, poetry_outputs: List[str], dataset_name: str = '', model_name: str = 'sanganaka/bge-m3-sanskritFT'):
     histogram_labels, histogram_lengths, meter_verses = make_anushtup_histograms(poetry_outputs)
 
-    semantic_model = SentenceTransformer('sanganaka/bge-m3-sanskritFT')
+    semantic_model = SentenceTransformer(model_name)
     in_embs = semantic_model.encode(inputs, convert_to_tensor=True)
     out_embs = semantic_model.encode(poetry_outputs, convert_to_tensor=True)
 
@@ -169,6 +169,7 @@ if __name__ == '__main__':
     parser.add_argument("--english_col", type=str, default="English")
     parser.add_argument("--sanskrit_col", type=str, default="Sanskrit")
     parser.add_argument("--output_prefix", type=str, default="syntactic_error_analysis")
+    parser.add_argument("--semantic_model", type=str, default="sanganaka/bge-m3-sanskritFT", help="SentenceTransformer model for semantic similarity")
     args = parser.parse_args()
 
     OUTPUT_PREFIX = args.output_prefix
@@ -182,7 +183,7 @@ if __name__ == '__main__':
     english_inputs = df[args.english_col].tolist()
     sanskrit_outputs = df[args.sanskrit_col].tolist()
 
-    metrics = evaluate_generated(english_inputs, sanskrit_outputs, dataset_name='syntactic_analysis')
+    metrics = evaluate_generated(english_inputs, sanskrit_outputs, dataset_name='syntactic_analysis', model_name=args.semantic_model)
 
     full_anushtup_percent, partial_anushtup_percent = calculate_anushtup_percentages(
         metrics.histogram_labels, metrics.histogram_lengths
